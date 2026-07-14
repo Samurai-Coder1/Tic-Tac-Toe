@@ -1,0 +1,91 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e1e2f, #252538);
+    color: #ffffff;
+}
+
+.game-container {
+    text-align: center;
+    background: #2b2b40;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    color: #4facfe;
+}
+
+#status {
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #00f2fe;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    gap: 12px;
+    margin: 0 auto 25px auto;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: #34344e;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.cell:hover {
+    background: #414162;
+    transform: scale(1.05);
+}
+
+/* Color differences for X and O tokens */
+.cell[data-value="X"] {
+    color: #ff4b5c;
+}
+
+.cell[data-value="O"] {
+    color: #00f2fe;
+}
+
+button#reset {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #1e1e2f;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+button#reset:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 242, 254, 0.4);
+}
+
+button#reset:active {
+    transform: translateY(0);
+}
