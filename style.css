@@ -61,12 +61,12 @@ h1 {
 }
 
 /* Color differences for X and O tokens */
-.cell[data-value="X"] {
-    color: #ff4b5c;
+.cell[data-sign="X"] {
+    color: #ff4b5c !important;
 }
 
-.cell[data-value="O"] {
-    color: #00f2fe;
+.cell[data-sign="O"] {
+    color: #00f2fe !important;
 }
 
 button#reset {
