@@ -22,7 +22,6 @@ function renderBoard() {
             if (currentVal === 'X' || currentVal === 'O') {
                 cell.innerText = currentVal;
                 
-                // CRUCIAL LINE: This must match your CSS selectors exactly!
                 cell.setAttribute('data-sign', currentVal); 
             } else {
                 cell.innerText = '';
