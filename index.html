@@ -11,6 +11,12 @@
 <body>
     <div class="game-container">
         <h1>Tic-Tac-Toe</h1>
+
+        <div class= "mode-bar">
+            <button id="mode-multiplayer" class="mode-btn" onclick="setMode('multiplayer')">Multiplayer</button>
+            <button id="mode-ai" class="mode-btn active" onclick="setMode('ai')">AI</button>
+        </div>
+        
         <div id="status">Your Turn! (O)</div>
 
         <div class="grid" id="board"></div>
