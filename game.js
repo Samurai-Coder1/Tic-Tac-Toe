@@ -5,55 +5,70 @@ let board = [
     ['7', '8', '9']
 ];
 let gameOver = false;
+let mode = 'ai'; // ai or multiplr option
+let currentPlayer = 'X'; // Used in multiplr mode
+let inputLocked = false;
+let computerMoveTimeout = null;
 
 const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
+const modeAiBtn = document.getElementById('mode-ai');
+const modeMultiplayerBtn = document.getElementById('mode-multiplayer');
+modeAiBtn.style.background = 'linear-gradient(135deg, #4facfe, #00f2fe)';
 
-// Converting Python display_board() by rendering interactive DOM buttons
+function setMode(newMode) {
+    mode = newMode;
+
+    const aiActive = mode === 'ai';
+    modeAiBtn.classList.toggle('active', aiActive);
+    modeAiBtn.style.background = aiActive ? 'linear-gradient(135deg, #4facfe, #00f2fe)' : '';
+    modeAiBtn.blur();
+
+    const multiplayerActive = mode === 'multiplayer';
+    modeMultiplayerBtn.classList.toggle('active', multiplayerActive);
+    modeMultiplayerBtn.style.background = multiplayerActive ? 'linear-gradient(135deg, #ff9966, #ff5e62)' : '';
+    modeMultiplayerBtn.blur();
+
+    resetGame();
+}
+
 function renderBoard() {
     boardElement.innerHTML = '';
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 3; c++) {
             const cell = document.createElement('button');
             cell.classList.add('cell');
-
-            // Display empty space if it's just a placeholder digit
-            const currentVal = board[r][c];
-            if (currentVal === 'X' || currentVal === 'O') {
-                cell.innerText = currentVal;
-                
-                cell.setAttribute('data-sign', currentVal); 
-            } else {
-                cell.innerText = '';
+            const value = board[r][c];
+            cell.innerText = (value === 'X' || value === 'O') ? value : '';
+            if (value === 'X' || value === 'O') {
+                cell.setAttribute('data-value', value);
             }
-
-            // const value = board[r][c];
-            // cell.innerText = (value === 'X' || value === 'O') ? value : '';
-
-            // Wire up user click tracking
-            cell.addEventListener('click', () => handleUserMove(r, c));
+            cell.addEventListener('click', () => handleCellClick(r, c));
             boardElement.appendChild(cell);
         }
     }
 }
 
-// Converting Python make_list_of_free_fields()
 function makeListOfFreeFields() {
     let freeFields = [];
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 3; c++) {
-            if (board[r][c] !== 'X' && board[r][c] !== 'O') {
-                freeFields.push({ r, c });
+            if (board[r][c] !== 'X' && board[r][c] !== 'O') freeFields.push({ r, c });
             }
         }
-    }
     return freeFields;
 }
 
-//  User interaction converting Python enter_move)
-function handleUserMove(row, col) {
-    if (gameOver || board[row][col] === 'X' || board[row][col] === 'O') return;
+function handleCellClick(row, col) {
+    if (gameOver || inputLocked || board[row][col] === 'X' || board[row][col] === 'O') return;
+    if (mode === 'ai') {
+        handleUserMove(row, col);
+    } else {
+        handleMultiplayerMove(row, col);
+    }
+}
 
+function handleUserMove(row, col) {
     board[row][col] = 'O';
     renderBoard();
 
@@ -67,13 +82,40 @@ function handleUserMove(row, col) {
         gameOver = true;
         return;
     }
-
-    // Hand over control to computer
+    // Control to computer
     statusElement.innerText = "Computer thinking...";
-    setTimeout(drawMove, 500); // 500ms delay mimics artificial thought
+    inputLocked = true;
+    computerMoveTimeout = setTimeout(drawMove, 400);
 }
 
-// Converting Python victory_for()
+function playerLabel(sign) {
+    return sign === 'X' ? 'Player 1' : 'Player 2';
+}
+
+function setStatusForPlayer(sign, text) {
+    statusElement.innerText = text;
+    statusElement.style.setProperty('color', sign === 'X' ? '#ff4b5c' : '#00f2fe', 'important');
+}
+
+function handleMultiplayerMove(row, col) {
+    board[row][col] = currentPlayer;
+    renderBoard();
+
+    if (victoryFor(currentPlayer)) {
+        setStatusForPlayer(currentPlayer, `🎉 ${playerLabel(currentPlayer)} wins!`);
+        gameOver = true;
+        return;
+    }
+    if (makeListOfFreeFields().length === 0) {
+        statusElement.innerText = "🤝 It's a tie!";
+        statusElement.style.color = '#00f2fe';
+        gameOver = true;
+        return;
+    }
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    setStatusForPlayer(currentPlayer, `${playerLabel(currentPlayer)}'s turn!`);
+}
+
 function victoryFor(sign) {
     // Check rows and columns
     for (let i = 0; i < 3; i++) {
@@ -87,10 +129,12 @@ function victoryFor(sign) {
     return false;
 }
 
-// Converting Python draw_move() with the corrected Python logic workflow
 function drawMove() {
     let freeFields = makeListOfFreeFields();
-    if (freeFields.length === 0 || gameOver) return;
+    if (freeFields.length === 0 || gameOver) {
+        inputLocked = false;
+        return;
+    }
 
     // 1. AI checks if Computer ('X') can win immediately
     for (let field of freeFields) {
@@ -100,6 +144,7 @@ function drawMove() {
             renderBoard();
             statusElement.innerText = "🤖 Computer won!";
             gameOver = true;
+            inputLocked = false;
             return; // Valid move secured victory
         }
         board[field.r][field.c] = backup;
@@ -113,6 +158,7 @@ function drawMove() {
             board[field.r][field.c] = 'X'; // Lock block choice
             renderBoard();
             statusElement.innerText = "Your Turn! (O)";
+            inputLocked = false;
             return;
         }
         board[field.r][field.c] = backup;
@@ -131,6 +177,7 @@ function drawMove() {
     } else {
         statusElement.innerText = "Your Turn! (O)";
     }
+    inputLocked = false;
 }
 
 // Clean initialization & reset script state
@@ -141,10 +188,21 @@ function resetGame() {
         ['7', '8', '9']
     ];
     gameOver = false;
-    statusElement.innerText = "Your Turn! (O)";
+    inputLocked = false;
 
-    // Mimic the mandatory Python starting condition: center move (1,1) is 'X'
-    board[1][1] = 'X';
+    if(computerMoveTimeout !== null) {
+        clearTimeout(computerMoveTimeout);
+        computerMoveTimeout = null;
+    }
+
+    if (mode === 'ai') {
+        board[1][1] = 'X';
+        statusElement.innerText = "Your Turn! (O)";
+        statusElement.style.color = '#00f2fe';
+    } else {
+        currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
+        setStatusForPlayer(currentPlayer, `${playerLabel(currentPlayer)}'s turn`);
+    }
 
     renderBoard();
 }
