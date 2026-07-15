@@ -99,11 +99,11 @@ h1 {
 }
 
 /* Color differences for X and O tokens */
-.cell[data-sign="X"] {
+.cell[data-value="X"] {
     color: #ff4b5c !important;
 }
 
-.cell[data-sign="O"] {
+.cell[data-value="O"] {
     color: #00f2fe !important;
 }
 
