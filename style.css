@@ -28,6 +28,44 @@ h1 {
     color: #4facfe;
 }
 
+.mode-bar {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #414162;
+}
+
+.mode-btn {
+    flex: 1;
+    padding: 12px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    background: #34344e;
+    color: #9a9ac0;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.mode-btn:hover {
+    background: #414162;
+    color: #ffffff;
+}
+
+.mode-btn.active {
+    color: #1e1e2f;
+}
+
+.mode-btn.active:hover {
+    color: #1e1e2f;
+}
+
+.mode-btn:first-child {
+    border-right: 1px solid #1e1e2f;
+}
+
 #status {
     font-size: 1.2rem;
     margin-bottom: 25px;
