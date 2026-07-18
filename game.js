@@ -195,7 +195,7 @@ function drawMove() {
 
     let chosenMove = { r: -1, c: -1 };
 
-    if (difficulty === 'easy' && Math.random() < 0.70) {
+    if (difficulty === 'easy' && Math.random() < 0.90) {
         let randomIndex = Math.floor(Math.random() * freeFields.length);
         chosenMove = freeFields[randomIndex]
     }
