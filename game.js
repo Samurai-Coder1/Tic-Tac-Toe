@@ -39,7 +39,7 @@ function setMode(newMode) {
     if (mode == 'multiplayer') {
         difficultyBar.classList.add('hide-difficulty');
     } else {
-        difficultyBar.classList.remove('hide-difficulty')
+        difficultyBar.classList.remove('hide-difficulty');
     }
     resetGame();
 }
