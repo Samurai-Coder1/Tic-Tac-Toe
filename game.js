@@ -6,15 +6,22 @@ let board = [
 ];
 let gameOver = false;
 let mode = 'ai'; // ai or multiplr option
+let difficulty = 'impossible';
 let currentPlayer = 'X'; // Used in multiplr mode
 let inputLocked = false;
 let computerMoveTimeout = null;
 
 const boardElement = document.getElementById('board');
 const statusElement = document.getElementById('status');
+
 const modeAiBtn = document.getElementById('mode-ai');
+const diffEasyBtn = document.getElementById('diff-easy');
+const diffImpossibleBtn = document.getElementById('diff-impossible');
+const difficultyBar = document.getElementById('difficulty-bar');
 const modeMultiplayerBtn = document.getElementById('mode-multiplayer');
+
 modeAiBtn.style.background = 'linear-gradient(135deg, #4facfe, #00f2fe)';
+diffImpossibleBtn.style.background = 'linear-gradient(135deg, #ff4b5c, #ff758c)';
 
 function setMode(newMode) {
     mode = newMode;
@@ -28,6 +35,27 @@ function setMode(newMode) {
     modeMultiplayerBtn.classList.toggle('active', multiplayerActive);
     modeMultiplayerBtn.style.background = multiplayerActive ? 'linear-gradient(135deg, #ff9966, #ff5e62)' : '';
     modeMultiplayerBtn.blur();
+
+    if (mode == 'multiplayer') {
+        difficultyBar.classList.add('hide-difficulty');
+    } else {
+        difficultyBar.classList.remove('hide-difficulty')
+    }
+    resetGame();
+}
+
+function setDifficulty(newDifficulty) {
+    difficulty = newDifficulty;
+
+    const isEasy = difficulty == 'easy';
+    diffEasyBtn.classList.toggle('active', isEasy);
+    diffEasyBtn.style.background = isEasy ? 'linear-gradient(135, #11998e, #38ef7d)' : '';
+    diffEasyBtn.blur();
+    
+    const isImpossible = difficulty === 'impossible';
+    diffImpossibleBtn.classList.toggle('active', isImpossible);
+    diffImpossibleBtn.style.background = isImpossible ? 'linear-gradient(135deg, #ff4b5c, #ff758c)' : '';
+    diffImpossibleBtn.blur();
 
     resetGame();
 }
@@ -129,6 +157,35 @@ function victoryFor(sign) {
     return false;
 }
 
+function minimax(depth, isMaximizing) {
+    if (victoryFor('X')) return 10 - depth;
+    if (victoryFor('O')) return depth - 10;
+
+    let freeFields = makeListOfFreeFields();
+    if (freeFields.length === 0) return 0;
+
+    if (isMaximizing) {
+        let best = -1000;
+
+        for (let field of freeFields) {
+            let backup = board[field.r][field.c];
+            board[field.r][field.c] = 'X';
+            best = Math.max(best, minimax(depth + 1, false));
+            board[field.r][field.c] = backup;
+        }
+        return best;
+    } else {
+        let best = 1000;
+        for (let field of freeFields) {
+            let backup = board[field.r][field.c];
+            board[field.r][field.c] = 'O';
+            best = Math.min(best, minimax(depth + 1, true));
+            board[field.r][field.c] = backup;
+        }
+        return best;
+    }
+}
+
 function drawMove() {
     let freeFields = makeListOfFreeFields();
     if (freeFields.length === 0 || gameOver) {
@@ -136,42 +193,41 @@ function drawMove() {
         return;
     }
 
-    // 1. AI checks if Computer ('X') can win immediately
-    for (let field of freeFields) {
-        let backup = board[field.r][field.c];
-        board[field.r][field.c] = 'X';
-        if (victoryFor('X')) {
-            renderBoard();
-            statusElement.innerText = "🤖 Computer won!";
-            gameOver = true;
-            inputLocked = false;
-            return; // Valid move secured victory
-        }
-        board[field.r][field.c] = backup;
+    let chosenMove = { r: -1, c: -1 };
+
+    if (difficulty === 'easy' && Math.random() < 0.70) {
+        let randomIndex = Math.floor(Math.random() * freeFields.length);
+        chosenMove = freeFields[randomIndex]
     }
 
-    // 2. AI checks if Player ('O') can win and blocks them
-    for (let field of freeFields) {
-        let backup = board[field.r][field.c];
-        board[field.r][field.c] = 'O';
-        if (victoryFor('O')) {
-            board[field.r][field.c] = 'X'; // Lock block choice
-            renderBoard();
-            statusElement.innerText = "Your Turn! (O)";
-            inputLocked = false;
-            return;
+    else {
+        let bestVal = -1000;
+        for (let field of freeFields) {
+            let backup = board[field.r][field.c];
+            board[field.r][field.c] = 'X';
+
+            let moveVal = minimax(0, false);
+
+            board[field.r][field.c] = backup;
+
+            if (moveVal > bestVal) {
+                chosenMove.r = field.r;
+                chosenMove.c = field.c;
+                bestVal = moveVal;
+            }
         }
-        board[field.r][field.c] = backup;
     }
 
-    // 3. Fallback: Select a random remaining index
-    let randomIndex = Math.floor(Math.random() * freeFields.length);
-    let choice = freeFields[randomIndex];
-    board[choice.r][choice.c] = 'X';
+    if (chosenMove.r !== -1 && chosenMove.c !== -1) {
+        board[chosenMove.r][chosenMove.c] = 'X';
+    }
 
     renderBoard();
 
-    if (makeListOfFreeFields().length === 0) {
+    if (victoryFor('X')) {
+        statusElement.innerText = "🤖 Computer won!";
+        gameOver = true;
+    } else if (makeListOfFreeFields().length === 0) {
         statusElement.innerText = "🤝 It's a tie!";
         gameOver = true;
     } else {
@@ -180,7 +236,6 @@ function drawMove() {
     inputLocked = false;
 }
 
-// Clean initialization & reset script state
 function resetGame() {
     board = [
         ['1', '2', '3'],
@@ -207,5 +262,4 @@ function resetGame() {
     renderBoard();
 }
 
-// Boot up game logic right away
 resetGame();
