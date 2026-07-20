@@ -252,7 +252,7 @@ function resetGame() {
 
     if (mode === 'ai') {
         statusElement.style.color = '#00f2fe';
-        if (Math.random() < 0.5) {
+        if (Math.random() < 0.4) {
             statusElement.innerText = "Computer thinking...";
             inputLocked = true;
             renderBoard();
