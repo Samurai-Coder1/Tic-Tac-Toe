@@ -251,9 +251,15 @@ function resetGame() {
     }
 
     if (mode === 'ai') {
-        board[1][1] = 'X';
-        statusElement.innerText = "Your Turn! (O)";
         statusElement.style.color = '#00f2fe';
+        if (Math.random() < 0.5) {
+            statusElement.innerText = "Computer thinking...";
+            inputLocked = true;
+            renderBoard();
+            computerMoveTimeout = setTimeout(drawMove, 400);
+            return;
+        } else {
+        statusElement.innerText = "Your Turn! (O)";
     } else {
         currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
         setStatusForPlayer(currentPlayer, `${playerLabel(currentPlayer)}'s turn`);
