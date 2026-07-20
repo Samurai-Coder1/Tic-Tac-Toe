@@ -260,6 +260,7 @@ function resetGame() {
             return;
         } else {
             statusElement.innerText = "Your Turn! (O)";
+        }
     } else {
         currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
         setStatusForPlayer(currentPlayer, `${playerLabel(currentPlayer)}'s turn`);
