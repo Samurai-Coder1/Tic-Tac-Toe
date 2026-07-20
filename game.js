@@ -259,7 +259,7 @@ function resetGame() {
             computerMoveTimeout = setTimeout(drawMove, 400);
             return;
         } else {
-        statusElement.innerText = "Your Turn! (O)";
+            statusElement.innerText = "Your Turn! (O)";
     } else {
         currentPlayer = Math.random() < 0.5 ? 'X' : 'O';
         setStatusForPlayer(currentPlayer, `${playerLabel(currentPlayer)}'s turn`);
